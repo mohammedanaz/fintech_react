@@ -16,7 +16,7 @@ const userAuthSlice = createSlice({
     initialState,
     reducers: {
       setUser: (state, action) => {
-        console.log('setUser reducere called');
+        console.log('setUser reducere called...');
         
         state.isAuthenticated = true;
         state.isActive = action.payload.isActive;
@@ -27,8 +27,14 @@ const userAuthSlice = createSlice({
         state.role = action.payload.role;
         
       },
+      refreshTokens: (state, action) => {
+        console.log('refreshTokens reducer called...');
+        state.accessToken = action.payload.access;
+        state.refreshToken = action.payload.refresh;
+        state.isAuthenticated = true;
+      },
       logout: (state) => {
-        console.log('inside logout reducer');
+        console.log('logout reducer called...');
 
         state.accessToken = null;
         state.refreshToken = null;
@@ -37,10 +43,10 @@ const userAuthSlice = createSlice({
         state.email = null;
         state.fullName = null;
         state.role = null;
-    }
-    },
-  });
+      }
+      },
+    });
   
-export const {setUser, logout} = userAuthSlice.actions;
+export const {setUser, refreshTokens, logout} = userAuthSlice.actions;
 
 export default userAuthSlice.reducer;
