@@ -5,7 +5,7 @@ export default function LandingPage() {
   return (
     <div className='container'>
         <Header />
-        <h1>Landing Page.</h1>
+        <h1 className='my-2 text-center'>Landing Page.</h1>
     </div>
   )
 }

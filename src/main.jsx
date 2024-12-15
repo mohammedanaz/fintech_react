@@ -1,6 +1,7 @@
 import { createRoot } from 'react-dom/client'
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
+import "./axios/Interceptors.jsx"
 import App from './App.jsx'
 import {Provider} from "react-redux";
 import {persistor, store} from "./redux/stores/store";

@@ -1,8 +1,7 @@
 import axios from 'axios';
 import {store} from "../redux/stores/store";
 import {refreshTokens, logout} from "../redux/slices/AuthSlice";
-import instance from './Instances';
-import {noAuthInstance} from './Instances';
+import instance, {noAuthInstance} from './Instances';
 
 // Intercept requests to attach the access token on request header.
 instance.interceptors.request.use(
@@ -10,6 +9,7 @@ instance.interceptors.request.use(
         console.log('inside req interceptor');
         const state = store.getState();
         const token = state.userAuth.accessToken;
+        console.log("Access Token:", token);
 
         if (token) {
             config.headers.Authorization = `Bearer ${token}`;
