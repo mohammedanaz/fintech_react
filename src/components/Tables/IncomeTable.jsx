@@ -9,12 +9,14 @@ import { IconButton,
     DialogContent,
     DialogTitle, 
     TextField, Button, MenuItem, Select, InputLabel, FormControl } from '@mui/material';
+import Spinner from '../Spinner/Spinner';
 
 export default function IncomeTable() {
     const [incomeData, setIncomeData] = useState([]);
     const [openModal, setOpenModal] = useState(false);
     const [openModalEdit, setOpenModalEdit] = useState(false);
     const showToast = useToast();
+    const [isLoading, setIsLoading] = useState(false);
     const [newIncome, setNewIncome] = useState({
         date_received: '',
         amount: '',
@@ -27,10 +29,13 @@ export default function IncomeTable() {
     useEffect(() => {
         const fetchIncomeData = async () => {
             try {
+                setIsLoading(true)
                 const response = await IncomeApi.incomeList();
                 console.log('fetch income data - ', response);
                 setIncomeData(response);
+                setIsLoading(false)
             } catch (error) {
+                setIsLoading(false)
                 console.error("Error fetching income data:", error);
             }
         };
@@ -152,6 +157,13 @@ export default function IncomeTable() {
         setEditedIncome({})
         setOpenModalEdit(false);
     };
+
+    if(isLoading){
+          return (
+            <div className="container mt-4">
+              <Spinner />
+            </div>
+        )};
 
     return (
         <div className="container mt-4">
