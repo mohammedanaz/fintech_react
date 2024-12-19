@@ -13,6 +13,10 @@ const Income = {
         const response = await instance.delete(`finance/income-delete/${rowId}`);
         return response.data; 
     },
+    incomeEdit: async (data) => {
+        const response = await instance.patch('finance/income-edit/', data);
+        return response.data; 
+    },
     
   };
   

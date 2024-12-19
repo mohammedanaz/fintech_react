@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Tab, Tabs } from 'react-bootstrap';
 import IncomeTable from '../Tables/IncomeTable';
+import MonthlyIncomeChart from '../Charts/Individual/Income';
 
 function TableNavs() {
   const [key, setKey] = useState('income');
@@ -14,7 +15,14 @@ function TableNavs() {
         className="mb-3"
       >
         <Tab eventKey="income" title="Income">
-          <IncomeTable />
+          <div className='d-flex flex-column flex-md-row mb-3'>
+            <div className="col-md-8">
+              <IncomeTable />
+            </div>
+            <div className="col-md-4">
+              <MonthlyIncomeChart />
+            </div>
+          </div>
         </Tab>
         <Tab eventKey="expense" title="Expense">
           <h2>Expense Table</h2>

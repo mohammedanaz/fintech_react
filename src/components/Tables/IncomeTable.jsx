@@ -13,6 +13,7 @@ import { IconButton,
 export default function IncomeTable() {
     const [incomeData, setIncomeData] = useState([]);
     const [openModal, setOpenModal] = useState(false);
+    const [openModalEdit, setOpenModalEdit] = useState(false);
     const showToast = useToast();
     const [newIncome, setNewIncome] = useState({
         date_received: '',
@@ -21,6 +22,7 @@ export default function IncomeTable() {
         category_name: '',
         notes: '',
     });
+    const [editedIncome, setEditedIncome] = useState({});
 
     useEffect(() => {
         const fetchIncomeData = async () => {
@@ -39,20 +41,20 @@ export default function IncomeTable() {
     // Columns definition
     const columns = [
         { field: 'date_received', headerName: 'Date', width: 150 },
-        { field: 'amount', headerName: 'Amount', width: 150 },
-        { field: 'source', headerName: 'Source', width: 150 },
+        { field: 'amount', headerName: 'Amount', width: 100 },
+        { field: 'source', headerName: 'Source', width: 100 },
         { field: 'category_name', headerName: 'Category', width: 150 },
         { field: 'notes', headerName: 'Notes', width: 200 },
         {
             field: 'actions',
             headerName: 'Actions',
             type: 'actions',
-            width: 150,
+            width: 120,
             getActions: (params) => [
                 <GridActionsCellItem
                     icon={<Edit />}
                     label="Edit"
-                    onClick={() => handleEdit(params)}
+                    onClick={() => handleOpenModalEdit(params)}
                     color="primary"
                 />,
                 <GridActionsCellItem
@@ -68,9 +70,25 @@ export default function IncomeTable() {
     const [pageSize, setPageSize] = useState(5); 
     const [page, setPage] = useState(0);
 
-    const handleEdit = (params) => {
-        console.log('Edit action triggered for row:', params.row);
-        // Implement logic for editing here.
+    const handleEdit = async () => {
+        const confirmed = window.confirm('Are you sure you want to edit this income?');
+        if (!confirmed) {
+            return;
+        }
+        try {
+            console.log('edited income data to be sent - ', editedIncome);
+            
+            const response = await IncomeApi.incomeEdit(editedIncome);
+            console.log('Income edit successfully:', response);
+            setIncomeData(prevData => [
+                ...prevData.filter(income => income.id !== response.id),
+                response,
+            ]);
+            handleCloseModalEdit()
+            showToast("Successfully edited the income", "success");
+        } catch (error) {
+            console.error("Error deleting income:", error);
+        }
     };
 
     const handleDelete = async (params) => {
@@ -89,7 +107,6 @@ export default function IncomeTable() {
         }
     };
 
-    // Handle form input change
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setNewIncome(prevState => ({
@@ -97,14 +114,18 @@ export default function IncomeTable() {
             [name]: value,
         }));
     };
+    const handleEditInputChange = (e) => {
+        const { name, value } = e.target;
+        setEditedIncome(prevState => ({
+            ...prevState,
+            [name]: value,
+        }));
+    };
 
-    // Handle form submission
     const handleAddIncome = async () => {
         try {
-            // Call the API to create the new income record
             const response = await IncomeApi.incomeCreate(newIncome); 
             console.log('New income added successfully:', response);
-            // Update the state with the new income data
             setIncomeData(prevData => [...prevData, response]);
             setOpenModal(false);
             showToast("Successfully added the income", "success");
@@ -117,10 +138,19 @@ export default function IncomeTable() {
     const handleAddNew = () => {
         setOpenModal(true);
     };
+    const handleOpenModalEdit = (params) => {
+        setEditedIncome(params.row)
+        setOpenModalEdit(true)
+        console.log('Edit action triggered for row:', params.row);
+    }
 
     // Close the modal
     const handleCloseModal = () => {
         setOpenModal(false);
+    };
+    const handleCloseModalEdit = () => {
+        setEditedIncome({})
+        setOpenModalEdit(false);
     };
 
     return (
@@ -185,7 +215,6 @@ export default function IncomeTable() {
                         margin="normal"
                     />
                     
-                    {/* Category Select */}
                     <FormControl fullWidth margin="normal">
                         <InputLabel id="category-name-label">Category</InputLabel>
                         <Select
@@ -216,6 +245,72 @@ export default function IncomeTable() {
                     </Button>
                     <Button onClick={handleAddIncome} color="primary">
                         Add
+                    </Button>
+                </DialogActions>
+            </Dialog>
+            {/* Modal for Editing an Income */}
+            <Dialog open={openModalEdit} onClose={handleCloseModalEdit}>
+                <DialogTitle>Edit Income</DialogTitle>
+                <DialogContent>
+                    <TextField
+                        label="Date Received"
+                        name="date_received"
+                        type="date"
+                        value={editedIncome.date_received}
+                        onChange={handleEditInputChange}
+                        fullWidth
+                        margin="normal"
+                        InputLabelProps={{
+                            shrink: true,
+                        }}
+                    />
+                    <TextField
+                        label="Amount"
+                        name="amount"
+                        value={editedIncome.amount}
+                        onChange={handleEditInputChange}
+                        fullWidth
+                        margin="normal"
+                    />
+                    <TextField
+                        label="Source"
+                        name="source"
+                        value={editedIncome.source}
+                        onChange={handleEditInputChange}
+                        fullWidth
+                        margin="normal"
+                    />
+                    
+                    <FormControl fullWidth margin="normal">
+                        <InputLabel id="category-name-label">Category</InputLabel>
+                        <Select
+                            labelId="category-name-label"
+                            label="Category"
+                            name="category_name"
+                            value={editedIncome.category_name}
+                            onChange={handleEditInputChange}
+                        >
+                            <MenuItem value="Salary">Salary</MenuItem>
+                            <MenuItem value="Business">Business</MenuItem>
+                            <MenuItem value="Investment">Investment</MenuItem>
+                        </Select>
+                    </FormControl>
+
+                    <TextField
+                        label="Notes"
+                        name="notes"
+                        value={editedIncome.notes}
+                        onChange={handleEditInputChange}
+                        fullWidth
+                        margin="normal"
+                    />
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleCloseModalEdit} color="primary">
+                        Cancel
+                    </Button>
+                    <Button onClick={handleEdit} color="primary">
+                        Edit
                     </Button>
                 </DialogActions>
             </Dialog>

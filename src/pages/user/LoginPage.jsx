@@ -45,7 +45,6 @@ export default function LoginPage() {
     updatedOtp[index] = value;
     setOtp(updatedOtp);
 
-    // Auto focus to the next field when the user types
     if (value.length === 1 && index < 5) {
       document.getElementById(`otp-${index + 1}`).focus();
     }
@@ -53,7 +52,6 @@ export default function LoginPage() {
 
   const handleOtpSubmit = async () => {
     try{
-      // Check if all OTP fields are filled
     const isOtpComplete = otp.every((digit) => digit !== "");
     
     if (isOtpComplete) {
